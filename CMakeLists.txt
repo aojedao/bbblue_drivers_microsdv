@@ -156,6 +156,9 @@ include_directories(
 add_executable(diff_motor_driver src/bb-blue-diff-motor-driver-node.cpp)
 target_link_libraries(diff_motor_driver ${catkin_LIBRARIES} robotcontrol)
 
+add_executable(odomencodertest src/bbodomencodertest.cpp)
+target_link_libraries(odomencodertest ${catkin_LIBRARIES} robotcontrol)
+
 add_executable(imu_pub_node src/bb-blue-imu-mpu9250-node.cpp)
 target_link_libraries(imu_pub_node ${catkin_LIBRARIES} robotcontrol)
 

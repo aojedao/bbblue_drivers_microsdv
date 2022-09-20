@@ -1,38 +1,4 @@
-/**
- * @file bb-blue-diff-motor-driver-node.cpp
- *
- *
- * @brief     diff drive control for the motor controller on Beaglbone Blue
- *            using librobotcontrol (by James Strawson)
- *
- * @author    usxbrix
- * @date      Nov 2018
- *
- * @license
- * MIT License
- *
- * Copyright (c) 2018 usxbrix
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
 
-// %Tag(FULLTEXT)%
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include <geometry_msgs/Twist.h>
@@ -104,7 +70,7 @@ void cmd_velCallback(const geometry_msgs::Twist::ConstPtr& cmd_vel)
 int main(int argc, char** argv)
 {
   // ROS and node initialize
-  ros::init(argc, argv, "diff_motor_driver");
+  ros::init(argc, argv, "diff_motor_test");
 
   ros::NodeHandle n;
 
@@ -250,4 +216,4 @@ int main(int argc, char** argv)
   rc_motor_cleanup();
   return 0;
 }
-// %EndTag(FULLTEXT)%
+
