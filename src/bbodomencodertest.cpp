@@ -1,9 +1,15 @@
 
 #include "ros/ros.h"
+#include <iostream>
 #include "std_msgs/String.h"
 #include <geometry_msgs/Twist.h>
+#include <cmath>
+
 
 #include <rc/motor.h>
+#include <rc/encoder.h>
+#include <rc/encoder_pru.h>
+#include <rc/encoder_eqep.h>
 
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
@@ -112,7 +118,16 @@ int main(int argc, char** argv)
     return -1;
   }
   ROS_INFO("Initialize motor %d and %d with %d: OK", g_left_motor, g_right_motor, pwm_freq_hz);
-
+  
+  // initialize encoder hardware first
+  if(rc_encoder_eqep_init()){
+    ROS_ERROR("Initialize encoder FAILED");
+    //fprintf(stderr,"ERROR: failed to run rc_encoder_init\n");
+    return -1;
+  }
+  ROS_INFO("Initialize encoder: OK");
+  
+  
   // odometry publisher
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 50);
   tf::TransformBroadcaster odom_broadcaster;
@@ -123,6 +138,25 @@ int main(int argc, char** argv)
   double x = 0.0;
   double y = 0.0;
   double th = 0.0;
+
+  //odom variables
+  
+  //meters per tick
+  double mpt=0.000169162;
+  //La distancia entre la llanta y el centro del robot es de 0.063 m
+  double robot_diam=0.063;
+  double old_left_encoder_pos=0;
+  double old_right_encoder_pos=0;
+  double actual_left_encoder_pos;
+  double actual_right_encoder_pos;
+  double dr=0;
+  double dl=0;
+  double delta_dr=0;
+  double delta_dl=0;
+
+  double delta_theta=0;
+  double delta_distance=0;
+  double distance=0;
 
   // %EndTag(SUBSCRIBER)%
 
@@ -166,7 +200,26 @@ int main(int argc, char** argv)
     x += delta_x;
     y += delta_y;
     th += delta_th;
+    
+    actual_right_encoder_pos=rc_encoder_read(2);
+    actual_left_encoder_pos=rc_encoder_read(3)*(-1);
 
+    delta_dr=(actual_right_encoder_pos-old_right_encoder_pos)*mpt;
+    delta_dl=(actual_left_encoder_pos-old_left_encoder_pos)*mpt;
+    
+    dr=dr+delta_dr;
+    dl=dl+delta_dl;
+
+    std::cout << "El valor de dr es: "<<dr<<" | El valor de delta_dr es: "<<delta_dr<<std::endl;
+
+    delta_theta=(delta_dr-delta_dl)/(2*robot_diam);
+    delta_distance=(delta_dr+delta_dl)/2;
+    distance=distance+delta_distance;
+
+    old_left_encoder_pos=actual_left_encoder_pos;
+    old_right_encoder_pos=actual_right_encoder_pos;
+
+    
     // since all odometry is 6DOF we'll need a quaternion created from yaw
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
 
@@ -214,6 +267,7 @@ int main(int argc, char** argv)
   // close motor hardware
   ROS_INFO("Calling rc_motor_cleanup()");
   rc_motor_cleanup();
+  rc_encoder_cleanup();
   return 0;
 }
 
