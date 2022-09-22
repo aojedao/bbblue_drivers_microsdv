@@ -191,15 +191,7 @@ int main(int argc, char** argv)
       g_driving = 0;
     }
 
-    // compute odometry in a typical way given the velocities of the robot
-    double dt = (current_time - last_time).toSec();
-    double delta_x = (vx * cos(th) - vy * sin(th)) * dt;
-    double delta_y = (vx * sin(th) + vy * cos(th)) * dt;
-    double delta_th = vth * dt;
-
-    x += delta_x;
-    y += delta_y;
-    th += delta_th;
+   
     
     actual_right_encoder_pos=rc_encoder_read(2);
     actual_left_encoder_pos=rc_encoder_read(3)*(-1);
@@ -210,7 +202,7 @@ int main(int argc, char** argv)
     dr=dr+delta_dr;
     dl=dl+delta_dl;
 
-    std::cout << "El valor de dr es: "<<dr<<" | El valor de delta_dr es: "<<delta_dr<<std::endl;
+   
 
     delta_theta=(delta_dr-delta_dl)/(2*robot_diam);
     delta_distance=(delta_dr+delta_dl)/2;
@@ -220,6 +212,25 @@ int main(int argc, char** argv)
     old_right_encoder_pos=actual_right_encoder_pos;
 
     
+
+    // compute odometry in a typical way given the velocities of the robot
+    double dt = (current_time - last_time).toSec();
+
+    double vel_x=delta_dr/dt;
+    double vel_y=delta_dl/dt;
+
+
+    double delta_x = delta_distance*(double)cos(delta_theta)*dt*10;
+    double delta_y = delta_distance*(double)sin(delta_theta)*dt*10;
+    double delta_th = (delta_dr-delta_dl)/(2*robot_diam);
+
+    std::cout << "El valor de x es: "<<actual_left_encoder_pos<<"m | El valor de y es: "<<actual_right_encoder_pos<<"m |El valor de th es:"<<th<<std::endl;
+
+
+    x += delta_x;
+    y += delta_y;
+    th += delta_th;
+
     // since all odometry is 6DOF we'll need a quaternion created from yaw
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
 

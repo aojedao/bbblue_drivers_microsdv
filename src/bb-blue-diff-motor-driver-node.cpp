@@ -91,7 +91,7 @@ void cmd_velCallback(const geometry_msgs::Twist::ConstPtr& cmd_vel)
 
   // calcaulate duty cycle form velocity and duty factor
   double duty_left = g_duty_factor * velocity_left;
-  double duty_right = g_duty_factor * velocity_right;
+  double duty_right = g_duty_factor * velocity_right*1.094;
 
   ROS_INFO("set LEFT motor: velocity:%f duty:%f RIGHT motor: velocity:%f duty:%f", velocity_left, duty_left,
            velocity_right, duty_right);
