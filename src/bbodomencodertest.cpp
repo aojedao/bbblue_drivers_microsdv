@@ -40,16 +40,11 @@ void cmd_velCallback(const geometry_msgs::Twist::ConstPtr& cmd_vel)
   vy = cmd_vel->linear.y;
   vth = cmd_vel->angular.z;
 
-  if (vx > g_maxspeed)
-  {
-    ROS_INFO("Velocity %f larger than %f! Limiting speed to %f.", vx, g_maxspeed, g_maxspeed);
-    vx = g_maxspeed;
-  }
 
   /*
   https://people.cs.umu.se/thomash/reports/KinematicsEquationsForDifferentialDriveAndArticulatedSteeringUMINF-11.19.pdf
   http://robotsforroboticists.com/drive-kinematics/
-
+  
   velocity_left_cmd = (linear_velocity – angular_velocity * WHEEL_BASE / 2.0)/WHEEL_RADIUS;
   velocity_right_cmd = (linear_velocity + angular_velocity * WHEEL_BASE / 2.0)/WHEEL_RADIUS;
 
@@ -60,17 +55,6 @@ void cmd_velCallback(const geometry_msgs::Twist::ConstPtr& cmd_vel)
 
   double velocity_left = (vx - vth * g_wheelbase / 2.0);
   double velocity_right = (vx + vth * g_wheelbase / 2.0);
-
-  // calcaulate duty cycle form velocity and duty factor
-  double duty_left = g_duty_factor * velocity_left;
-  double duty_right = g_duty_factor * velocity_right;
-
-  ROS_INFO("set LEFT motor: velocity:%f duty:%f RIGHT motor: velocity:%f duty:%f", velocity_left, duty_left,
-           velocity_right, duty_right);
-
-  rc_motor_set(g_left_motor, duty_left);
-  rc_motor_set(g_right_motor, duty_right);
-  g_driving = 1;
 }
 
 int main(int argc, char** argv)
@@ -101,23 +85,8 @@ int main(int argc, char** argv)
   ros::param::param("~duty_factor", g_duty_factor, 1.0);
   ros::param::param("~rate", g_rate, 10);
 
-  if (g_left_motor < 1 or g_left_motor > 4 or g_right_motor < 1 or g_right_motor > 4)
-  {
-    ROS_ERROR("ERROR: Wrong parameter: left_motor/right_motor must be between 1-4");
-    return -1;
-  }
 
   n.param<std::string>("base_frame_id", base_frame_id_, "base_link");
-  // TODO: motor parameter
-
-  // initialize motor hardware first
-  int pwm_freq_hz = RC_MOTOR_DEFAULT_PWM_FREQ;  // 25000
-  if (rc_motor_init_freq(pwm_freq_hz))
-  {
-    ROS_ERROR("Initialize motor %d and %d with %d: FAILED", g_left_motor, g_right_motor, pwm_freq_hz);
-    return -1;
-  }
-  ROS_INFO("Initialize motor %d and %d with %d: OK", g_left_motor, g_right_motor, pwm_freq_hz);
   
   // initialize encoder hardware first
   if(rc_encoder_eqep_init()){
@@ -176,25 +145,10 @@ int main(int argc, char** argv)
 
     current_time = ros::Time::now();
 
-    // stopping motor when no message received within timeout
-
-    if (g_driving && (ros::Time::now().toSec() - g_msg_received.toSec()) > cmd_vel_timeout)
-
-    {
-      ROS_INFO("TIMEOUT: No cmd_vel received: setting motors to 0");
-
-      // looks like 0 for all motors doesn't work
-      // rc_motor_set(0,0);
-      rc_motor_set(g_left_motor, 0);
-      rc_motor_set(g_right_motor, 0);
-
-      g_driving = 0;
-    }
-
    
     
-    actual_right_encoder_pos=rc_encoder_read(2);
-    actual_left_encoder_pos=rc_encoder_read(3)*(-1);
+    actual_right_encoder_pos=rc_encoder_read(2)*(-1);
+    actual_left_encoder_pos=rc_encoder_read(3);
 
     delta_dr=(actual_right_encoder_pos-old_right_encoder_pos)*mpt;
     delta_dl=(actual_left_encoder_pos-old_left_encoder_pos)*mpt;
@@ -220,11 +174,11 @@ int main(int argc, char** argv)
     double vel_y=delta_dl/dt;
 
 
-    double delta_x = delta_distance*(double)cos(delta_theta)*dt*10;
-    double delta_y = delta_distance*(double)sin(delta_theta)*dt*10;
+    double delta_x = delta_distance*(double)cos(delta_theta)*dt;
+    double delta_y = delta_distance*(double)sin(delta_theta)*dt;
     double delta_th = (delta_dr-delta_dl)/(2*robot_diam);
 
-    std::cout << "El valor de x es: "<<actual_left_encoder_pos<<"m | El valor de y es: "<<actual_right_encoder_pos<<"m |El valor de th es:"<<th<<std::endl;
+    std::cout << "El valor de x es: "<<x<<"m | El valor de y es: "<<y<<"m |El valor de th es:"<<th<<std::endl;
 
 
     x += delta_x;
@@ -276,8 +230,7 @@ int main(int argc, char** argv)
   // %EndTag(SPIN)%
 
   // close motor hardware
-  ROS_INFO("Calling rc_motor_cleanup()");
-  rc_motor_cleanup();
+  ROS_INFO("Calling rc_encoder_cleanup()");
   rc_encoder_cleanup();
   return 0;
 }
