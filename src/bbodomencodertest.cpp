@@ -112,8 +112,8 @@ int main(int argc, char** argv)
   
   //meters per tick
   double mpt=0.000169162;
-  //La distancia entre la llanta y el centro del robot es de 0.063 m
-  double robot_diam=0.063;
+  //La distancia entre la llanta y el centro del robot es de 0.08 m
+  double robot_radius=0.08;
   double old_left_encoder_pos=0;
   double old_right_encoder_pos=0;
   double actual_left_encoder_pos;
@@ -158,7 +158,7 @@ int main(int argc, char** argv)
 
    
 
-    delta_theta=(delta_dr-delta_dl)/(2*robot_diam);
+    delta_theta=(delta_dr-delta_dl)/(2*robot_radius);
     delta_distance=(delta_dr+delta_dl)/2;
     distance=distance+delta_distance;
 
@@ -174,15 +174,15 @@ int main(int argc, char** argv)
     double vel_y=delta_dl/dt;
 
 
-    double delta_x = delta_distance*(double)cos(delta_theta)*dt;
-    double delta_y = delta_distance*(double)sin(delta_theta)*dt;
-    double delta_th = (delta_dr-delta_dl)/(2*robot_diam);
+    double delta_x = delta_distance*(double)cos(delta_theta)*dt*10;
+    double delta_y = delta_distance*(double)sin(delta_theta)*dt*10;
+    double delta_th = (delta_dr-delta_dl)/(2*robot_radius);
 
-    std::cout << "El valor de x es: "<<x<<"m | El valor de y es: "<<y<<"m |El valor de th es:"<<th<<std::endl;
+    std::cout << "El valor de delta_y es: "<<delta_y<<"m | El valor de y es: "<<y<<"m |El valor de delta_distance es:"<<delta_distance<<std::endl;
 
 
     x += delta_x;
-    y += delta_y;
+    y -= delta_y;
     th += delta_th;
 
     // since all odometry is 6DOF we'll need a quaternion created from yaw
