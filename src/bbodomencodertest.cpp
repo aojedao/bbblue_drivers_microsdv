@@ -174,16 +174,16 @@ int main(int argc, char** argv)
     double vel_y=delta_dl/dt;
 
 
-    double delta_x = delta_distance*(double)cos(delta_theta)*dt*10;
-    double delta_y = delta_distance*(double)sin(delta_theta)*dt*10;
-    double delta_th = (delta_dr-delta_dl)/(2*robot_radius);
+    double delta_x = delta_distance*(double)cos(th)*dt*10;
+    double delta_y = delta_distance*(double)sin(th)*dt*10;
+    double delta_th = (delta_dl-delta_dr)/(2*robot_radius);
 
-    std::cout << "El valor de delta_y es: "<<delta_y<<"m | El valor de y es: "<<y<<"m |El valor de delta_distance es:"<<delta_distance<<std::endl;
+    std::cout << "El valor de x es: "<<x<<"m | El valor de y es: "<<y<<"m |El valor de th es:"<<th<<std::endl;
+    std::cout << "El valor de delta distance es: "<<delta_distance<<"m | El calor de delta y es: "<<delta_y<<std::endl;
 
-
-    x += delta_x;
-    y -= delta_y;
-    th += delta_th;
+    x = x + delta_x;
+    y = y + delta_y;
+    th = th + delta_th;
 
     // since all odometry is 6DOF we'll need a quaternion created from yaw
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);

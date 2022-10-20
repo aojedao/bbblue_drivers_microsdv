@@ -50,7 +50,7 @@ int g_right_motor;     // param default 2
 double g_maxspeed;     // param default 0.4
 double g_minspeed;     // param default 0.1
 double g_turnspeed;    // param default 1
-double g_wheelbase;    // param default 0.2
+double g_wheelbase=0.6;    // param default 0.2
 double g_duty_factor;  // param default 2.0
 int g_rate;            // param default 10
 
@@ -91,7 +91,8 @@ void cmd_velCallback(const geometry_msgs::Twist::ConstPtr& cmd_vel)
 
   // calcaulate duty cycle form velocity and duty factor
   double duty_left = g_duty_factor * velocity_left;
-  double duty_right = g_duty_factor * velocity_right*1.175;
+  // multiplicar 1.175 el duty right
+  double duty_right = g_duty_factor * velocity_right;
 
   ROS_INFO("set LEFT motor: velocity:%f duty:%f RIGHT motor: velocity:%f duty:%f", velocity_left, duty_left,
            velocity_right, duty_right);
@@ -236,7 +237,7 @@ int main(int argc, char** argv)
     odom.twist.twist.angular.z = vth;
 
     // publish the message
-    odom_pub.publish(odom);
+  //  odom_pub.publish(odom);
 
     last_time = current_time;
 
