@@ -10,9 +10,34 @@
 #include <rc/encoder.h>
 #include <rc/encoder_pru.h>
 #include <rc/encoder_eqep.h>
+#include <rc/mpu.h>
 
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
+
+//MPU values
+
+// bus for Robotics Cape and BeagleboneBlue is 2
+// change this for your platform
+#define I2C_BUS 2
+
+// possible modes, user selected with command line arguments
+typedef enum g_mode_t{
+        G_MODE_RAD,
+        G_MODE_DEG,
+        G_MODE_RAW
+} g_mode_t;
+typedef enum a_mode_t{
+        A_MODE_MS2,
+        A_MODE_G,
+        A_MODE_RAW
+} a_mode_t;
+
+static int enable_magnetometer = 0;
+static int enable_thermometer = 0;
+static int enable_warnings = 0;
+static int running = 0;
+
 
 // global variables
 ros::Time g_msg_received;
@@ -60,7 +85,7 @@ void cmd_velCallback(const geometry_msgs::Twist::ConstPtr& cmd_vel)
 int main(int argc, char** argv)
 {
   // ROS and node initialize
-  ros::init(argc, argv, "diff_motor_test");
+  ros::init(argc, argv, "odomencodertest");
 
   ros::NodeHandle n;
 
@@ -98,7 +123,7 @@ int main(int argc, char** argv)
   
   
   // odometry publisher
-  ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 50);
+  ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 10);
   tf::TransformBroadcaster odom_broadcaster;
 
   // cmd_vel subscriber 
@@ -126,6 +151,26 @@ int main(int argc, char** argv)
   double delta_theta=0;
   double delta_distance=0;
   double distance=0;
+  double delta_theta_gyro=0;
+  double old_gyrox=0;
+  double old_gyroy=0;
+  double old_gyroz=0;
+
+
+  //MPU variables and configurations
+  rc_mpu_data_t data; //struct to hold new data
+  g_mode_t g_mode = G_MODE_DEG; // gyro default to degree mode.
+  a_mode_t a_mode = A_MODE_MS2; // accel default to m/s^2
+
+  rc_mpu_config_t conf = rc_mpu_default_config();
+  conf.i2c_bus = I2C_BUS;
+  conf.enable_magnetometer = enable_magnetometer;
+  conf.show_warnings = enable_warnings;
+
+  if(rc_mpu_initialize(&data, conf)){
+  	fprintf(stderr,"rc_mpu_initialize_failed\n");
+        return -1;
+  }
 
   // %EndTag(SUBSCRIBER)%
 
@@ -179,7 +224,35 @@ int main(int argc, char** argv)
     double delta_th = (delta_dl-delta_dr)/(2*robot_radius);
 
     std::cout << "El valor de x es: "<<x<<"m | El valor de y es: "<<y<<"m |El valor de th es:"<<th<<std::endl;
-    std::cout << "El valor de delta distance es: "<<delta_distance<<"m | El calor de delta y es: "<<delta_y<<std::endl;
+    
+    
+    //Read and print MPU
+    // read sensor data
+    if(rc_mpu_read_accel(&data)<0){
+    	printf("read accel data failed\n");
+    }
+    if(rc_mpu_read_gyro(&data)<0){
+        printf("read gyro data failed\n");
+    }
+
+    std::cout << "Giro X "<<data.gyro[0]<<"deg | Giro y: "<<data.gyro[1]<<"Giro Z: "<<data.gyro[2]<<std::endl;
+
+    //Gyrodometry
+    double theta_thereshold=0.125/dt;
+
+    delta_theta_gyro=data.gyro[2]-old_gyroz;
+  
+   // if(abs(delta_theta_gyro-delta_th)>theta_thereshold){
+   //	    double delta_th=th+delta_theta_gyro*dt;
+   // }else{
+   //	    double delta_th=th+delta_th*dt;
+   // }
+
+    old_gyrox=data.gyro[0];
+    old_gyroy=data.gyro[1];
+    old_gyroz=data.gyro[2];
+
+
 
     x = x + delta_x;
     y = y + delta_y;
@@ -232,6 +305,7 @@ int main(int argc, char** argv)
   // close motor hardware
   ROS_INFO("Calling rc_encoder_cleanup()");
   rc_encoder_cleanup();
+  rc_mpu_power_off();
   return 0;
 }
 

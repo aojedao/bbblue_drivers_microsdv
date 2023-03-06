@@ -63,10 +63,11 @@ void cmd_velCallback(const geometry_msgs::Twist::ConstPtr& cmd_vel)
   g_msg_received = ros::Time::now();
   ROS_INFO("cmd_vel Linear: [%f, %f, %f] Angular: [%f, %f, %f]", cmd_vel->linear.x, cmd_vel->linear.y,
            cmd_vel->linear.z, cmd_vel->angular.x, cmd_vel->angular.y, cmd_vel->angular.z);
-
-  vx = cmd_vel->linear.x;
-  vy = cmd_vel->linear.y;
-  vth = cmd_vel->angular.z;
+//Estaban en 1.5 los lineales, 0.7 los angualres
+//Para turtlepria habia quedado en vx 2, vy 10 y vth 5.5
+  vx = cmd_vel->linear.x*1;
+  vy = cmd_vel->linear.y*1;
+  vth = cmd_vel->angular.z*1;
 
   if (vx > g_maxspeed)
   {
@@ -123,7 +124,7 @@ int main(int argc, char** argv)
   ros::param::param("~timeout", cmd_vel_timeout, 5);
   ros::param::param("~left_motor", g_left_motor, 1);
   ros::param::param("~right_motor", g_right_motor, 2);
-  ros::param::param("~maxspeed", g_maxspeed, 0.4);
+  ros::param::param("~maxspeed", g_maxspeed, 0.5);
   ros::param::param("~minspeed", g_minspeed, 0.1);
   ros::param::param("~wheelbase", g_wheelbase, 0.2);
   ros::param::param("~turnspeed", g_turnspeed, 1.0);

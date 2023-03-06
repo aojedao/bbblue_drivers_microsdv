@@ -1,4 +1,5 @@
 <launch>
+  <node name="odomencodertest" pkg="bbblue_drivers" type="odomencodertest" respawn="false" /> 
 
   <arg name="timeout" default="5" />
   <arg name="left_motor" default="1" />
@@ -8,7 +9,8 @@
   <arg name="wheelbase" default="0.6" />
   <arg name="turnspeed" default="1.0" />
   <arg name="duty_factor" default="1.0" />
-  <!--remap from="cmd_vel" to="turtle1/cmd_vel" -->
+  <remap from="cmd_vel" to="turtle1/cmd_vel"/>
+ 
   <node name="diff_motor_driver" pkg="bbblue_drivers" type="diff_motor_driver" respawn="true">
     <param name="timeout" value="$(arg timeout)" />
     <param name="left_motor" value="$(arg left_motor)" />
