@@ -159,6 +159,10 @@ target_link_libraries(diff_motor_driver ${catkin_LIBRARIES} robotcontrol)
 add_executable(odomencodertest src/bbodomencodertest.cpp)
 target_link_libraries(odomencodertest ${catkin_LIBRARIES} robotcontrol)
 
+add_executable(vel_control_odom src/vel_control_odom.cpp)
+target_link_libraries(vel_control_odom ${catkin_LIBRARIES} robotcontrol)
+
+
 add_executable(imu_pub_node src/bb-blue-imu-mpu9250-node.cpp)
 target_link_libraries(imu_pub_node ${catkin_LIBRARIES} robotcontrol)
 

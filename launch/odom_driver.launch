@@ -5,7 +5,7 @@
   <arg name="right_motor" default="2" />
   <arg name="maxspeed" default="0.6" />
   <arg name="minspeed" default="0.1" />
-  <arg name="wheelbase" default="0.2" />
+  <arg name="wheelbase" default="0.16" />
   <arg name="turnspeed" default="1.0" />
   <arg name="duty_factor" default="1.0" />
   <arg name="frame_id" default="imu_link" />
@@ -13,7 +13,8 @@
   <arg name="angular_velocity_stddev" default="0.02" />
   <arg name="orientation_stddev" default="0.0025" />
   <arg name="magnetometer_stddev" default="0.04" />
-  <remap from="cmd_vel" to="turtle1/cmd_vel"/>
+  <!-- remap from="cmd_vel" to="diffbot_controller/cmd_vel"-->
+  <!-- Esto es para diff_drive -->
 
   <node name="odomencodertest" pkg="bbblue_drivers" type="odomencodertest" respawn="true">
     <param name="timeout" value="$(arg timeout)" />
@@ -24,6 +25,7 @@
     <param name="wheelbase" value="$(arg wheelbase)" />
     <param name="turnspeed" value="$(arg turnspeed)" />
     <param name="duty_factor" value="$(arg duty_factor)" />
+    <!-- remap from="odom" to="diffbot_controller/odom" -->
   </node>
 
   <node name="diff_motor_driver" pkg="bbblue_drivers" type="diff_motor_driver" respawn="true">
