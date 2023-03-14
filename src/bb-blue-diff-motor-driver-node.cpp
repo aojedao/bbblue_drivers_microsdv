@@ -154,7 +154,7 @@ int main(int argc, char** argv)
   tf::TransformBroadcaster odom_broadcaster;
 
   // cmd_vel subscriber 
-  ros::Subscriber sub = n.subscribe("cmd_vel", 100, cmd_velCallback);
+  ros::Subscriber sub = n.subscribe("/cmd_vel", 100, cmd_velCallback);
 
   double x = 0.0;
   double y = 0.0;

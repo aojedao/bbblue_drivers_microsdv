@@ -331,8 +331,8 @@ int main(int argc, char** argv)
 
     if (error_lineal <= allowed_error && error_angular <= allowed_error ){
 	
-            double velocity_left = (vx +  vth * g_wheelbase / 2.0);
-	    double velocity_right = (vx - vth * g_wheelbase / 2.0);
+            double velocity_left = (vx -  vth * g_wheelbase / 2.0);
+	    double velocity_right = (vx + vth * g_wheelbase / 2.0);
 	
 	    //Motor duty command send
 	    // calcaulate duty cycle form velocity and duty factor
@@ -350,8 +350,8 @@ int main(int argc, char** argv)
 
     }
     else{
-	    double velocity_left =((controlPID_lineal + controlPID_angular) * g_wheelbase / 2.0);
-            double velocity_right = ((controlPID_lineal - controlPID_angular) * g_wheelbase / 2.0);
+	    double velocity_left =((controlPID_lineal - controlPID_angular) * g_wheelbase / 2.0);
+            double velocity_right = ((controlPID_lineal + controlPID_angular) * g_wheelbase / 2.0);
         
             //Motor duty command send
             // calcaulate duty cycle form velocity and duty factor
