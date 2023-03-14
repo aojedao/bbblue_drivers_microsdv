@@ -318,12 +318,12 @@ int main(int argc, char** argv)
     double integral_lineal = old_integral_lineal + error_lineal;
     double integral_angular = old_integral_angular + error_angular;
 
-    double kp_l = 5.5;
-    double ki_l = 0.12;
+    double kp_l = 3;
+    double ki_l = 0;
 
 
     double kp_a = 2;
-    double ki_a = 0.2;
+    double ki_a = 0;
 
 
     double controlPID_lineal = (vx+(kp_l*error_lineal) + (ki_l*integral_lineal)); 
@@ -336,7 +336,7 @@ int main(int argc, char** argv)
 	
 	    //Motor duty command send
 	    // calcaulate duty cycle form velocity and duty factor
-	    double duty_left = g_duty_factor * velocity_left;
+	    double duty_left = g_duty_factor * velocity_left*-1;
 	    // multiplicar 1.175 el duty right
 	    double duty_right = g_duty_factor * velocity_right;
 
@@ -355,7 +355,7 @@ int main(int argc, char** argv)
         
             //Motor duty command send
             // calcaulate duty cycle form velocity and duty factor
-            double duty_left = g_duty_factor * velocity_left;
+            double duty_left = g_duty_factor * velocity_left*-1;
             // multiplicar 1.175 el duty right
             double duty_right = g_duty_factor * velocity_right;
 
