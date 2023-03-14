@@ -268,11 +268,11 @@ int main(int argc, char** argv)
 
     delta_theta_gyro=data.gyro[2]-old_gyroz;
 
-   // if(abs(delta_theta_gyro-delta_th)>theta_thereshold){
-   //       double delta_th=th+delta_theta_gyro*dt;
-   // }else{
-   //       double delta_th=th+delta_th*dt;
-   // }
+    if(abs(delta_theta_gyro-delta_th)>theta_thereshold){
+          double delta_th=th+delta_theta_gyro;
+    }else{
+          double delta_th=th+delta_th;
+    }
 
     old_gyrox=data.gyro[0];
     old_gyroy=data.gyro[1];
@@ -318,12 +318,12 @@ int main(int argc, char** argv)
     double integral_lineal = old_integral_lineal + error_lineal;
     double integral_angular = old_integral_angular + error_angular;
 
-    double kp_l = 3;
-    double ki_l = 0;
+    double kp_l = 6;
+    double ki_l = 0.35;
 
 
-    double kp_a = 2;
-    double ki_a = 0;
+    double kp_a = 9;
+    double ki_a = 0.4;
 
 
     double controlPID_lineal = (vx+(kp_l*error_lineal) + (ki_l*integral_lineal)); 
@@ -336,9 +336,9 @@ int main(int argc, char** argv)
 	
 	    //Motor duty command send
 	    // calcaulate duty cycle form velocity and duty factor
-	    double duty_left = g_duty_factor * velocity_left*-1;
+	    double duty_left = g_duty_factor * velocity_left;
 	    // multiplicar 1.175 el duty right
-	    double duty_right = g_duty_factor * velocity_right;
+	    double duty_right = g_duty_factor * velocity_right*-1;
 
 	    ROS_INFO("set LEFT motor: velocity:%f duty:%f RIGHT motor: velocity:%f duty:%f", velocity_left, duty_left,
            velocity_right, duty_right);
@@ -355,9 +355,9 @@ int main(int argc, char** argv)
         
             //Motor duty command send
             // calcaulate duty cycle form velocity and duty factor
-            double duty_left = g_duty_factor * velocity_left*-1;
+            double duty_left = g_duty_factor * velocity_left;
             // multiplicar 1.175 el duty right
-            double duty_right = g_duty_factor * velocity_right;
+            double duty_right = g_duty_factor * velocity_right*-1;
 
             ROS_INFO("set LEFT motor: velocity:%f duty:%f RIGHT motor: velocity:%f duty:%f", velocity_left, duty_left,
            velocity_right, duty_right);
