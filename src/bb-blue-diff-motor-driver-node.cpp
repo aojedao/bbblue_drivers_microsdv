@@ -64,10 +64,16 @@ void cmd_velCallback(const geometry_msgs::Twist::ConstPtr& cmd_vel)
   ROS_INFO("cmd_vel Linear: [%f, %f, %f] Angular: [%f, %f, %f]", cmd_vel->linear.x, cmd_vel->linear.y,
            cmd_vel->linear.z, cmd_vel->angular.x, cmd_vel->angular.y, cmd_vel->angular.z);
 //Estaban en 1.5 los lineales, 0.7 los angualres
+<<<<<<< HEAD
 //Para turtlepria habia quedado en vx 2, vy 10 y vth 5.5
   vx = cmd_vel->linear.x*1;
   vy = cmd_vel->linear.y*1;
   vth = cmd_vel->angular.z*1;
+=======
+  vx = cmd_vel->linear.x*0.12;
+  vy = cmd_vel->linear.y*0.3;
+  vth = cmd_vel->angular.z*0.55;
+>>>>>>> hykabai
 
   if (vx > g_maxspeed)
   {
@@ -93,7 +99,7 @@ void cmd_velCallback(const geometry_msgs::Twist::ConstPtr& cmd_vel)
   // calcaulate duty cycle form velocity and duty factor
   double duty_left = g_duty_factor * velocity_left;
   // multiplicar 1.175 el duty right
-  double duty_right = g_duty_factor * velocity_right;
+  double duty_right = g_duty_factor * velocity_right*-1;
 
   ROS_INFO("set LEFT motor: velocity:%f duty:%f RIGHT motor: velocity:%f duty:%f", velocity_left, duty_left,
            velocity_right, duty_right);

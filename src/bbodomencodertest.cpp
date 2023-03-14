@@ -224,7 +224,11 @@ int main(int argc, char** argv)
     double delta_y = delta_distance*(double)sin(th)*dt*10;
     double delta_th = (delta_dl-delta_dr)/(2*robot_radius);
 
+<<<<<<< HEAD
     std::cout << "El valor de vel_x es: "<<vel_x<<"m | El valor de vel_y es: "<<vel_y<<"m |El valor de vel_th es:"<<vel_th<<std::endl;
+=======
+    std::cout << "El valor de x es: "<<x<<"m | El valor de y es: "<<y<<"m |El valor de th es:"<<th<<std::endl;
+>>>>>>> hykabai
     
     
     //Read and print MPU
