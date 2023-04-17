@@ -42,11 +42,11 @@ ros::Time g_msg_received;
 bool g_driving = 0;
 int g_left_motor;      // param default 1
 int g_right_motor;     // param default 2
-double g_maxspeed;     // param default 0.4
+double g_maxspeed=0.4;     // param default 0.4
 double g_minspeed;     // param default 0.1
 double g_turnspeed;    // param default 1
 double g_wheelbase;    // param default 0.2
-double g_duty_factor;  // param default 2.0
+double g_duty_factor=2;  // param default 2.0
 int g_rate;            // param default 10
 
 double vx = 0;
@@ -220,7 +220,7 @@ int main(int argc, char** argv)
       g_driving = 0;
     }
 
-    actual_right_encoder_pos=rc_encoder_read(2)*(-1);
+    actual_right_encoder_pos=rc_encoder_read(2)*(1);
     actual_left_encoder_pos=rc_encoder_read(3);
 
     delta_dr=(actual_right_encoder_pos-old_right_encoder_pos)*mpt;
@@ -228,8 +228,6 @@ int main(int argc, char** argv)
 
     dr=dr+delta_dr;
     dl=dl+delta_dl;
-
-
 
     delta_theta=(delta_dr-delta_dl)/(2*robot_radius);
     delta_distance=(delta_dr+delta_dl)/2;
@@ -249,8 +247,7 @@ int main(int argc, char** argv)
     double delta_y = delta_distance*(double)sin(th)*dt*10;
     double delta_th = (delta_dl-delta_dr)/(2*robot_radius);
 
-    std::cout << "El valor de vel_x es: "<<vel_x<<"m | El valor de vel_y es: "<<vel_y<<"m |El valor de vel_th es:"<<vel_th<<std::endl;
-
+  
 
     //Read and print MPU
     // read sensor data
@@ -261,10 +258,11 @@ int main(int argc, char** argv)
         printf("read gyro data failed\n");
     }
 
-    std::cout << "Giro X "<<data.gyro[0]<<"deg | Giro y: "<<data.gyro[1]<<"Giro Z: "<<data.gyro[2]<<std::endl;
+    std::cout << "Delta x "<<delta_x<<"m | Delta y: "<<delta_y<<"Delta Z: "<<delta_th<<std::endl;
 
     //Gyrodometry
-    double theta_thereshold=0.125/dt;
+    /*
+    double theta_thereshold=1/dt;
 
     delta_theta_gyro=data.gyro[2]-old_gyroz;
 
@@ -273,6 +271,7 @@ int main(int argc, char** argv)
     }else{
           double delta_th=th+delta_th;
     }
+    */
 
     old_gyrox=data.gyro[0];
     old_gyroy=data.gyro[1];
@@ -280,16 +279,18 @@ int main(int argc, char** argv)
     x = x + delta_x;
     y = y + delta_y;
     th = th + delta_th;
+
+    std::cout << "El valor de x es: "<<x<<"m | El valor de y es: "<<y<<"m |El valor de th es:"<<th<<std::endl;
  
     // Aqui ya calculo todo ----------------<<<<<<<<<<<<<<
     //
-    /**
-    double velocity_left = (vx - vth * g_wheelbase / 2.0);
-    double velocity_right = (vx + vth * g_wheelbase / 2.0);
+    
+    double velocity_left = vx - (vth * g_wheelbase / 2.0);
+    double velocity_right = vx +(vth * g_wheelbase / 2.0);
 
     //Motor duty command send
     // calcaulate duty cycle form velocity and duty factor
-    double duty_left = g_duty_factor * velocity_left;
+    double duty_left = g_duty_factor * velocity_left*-1;
     // multiplicar 1.175 el duty right
     double duty_right = g_duty_factor * velocity_right;
 
@@ -299,7 +300,7 @@ int main(int argc, char** argv)
     rc_motor_set(g_left_motor, duty_left);
     rc_motor_set(g_right_motor, duty_right);
     g_driving = 1;
-    **/
+    
     // Hasta aca comienza  publicar ----------------<<<<<<<<<<<<<<<<<< 
 
 
@@ -308,6 +309,7 @@ int main(int argc, char** argv)
     //CONTROL DE VELOCIDAD lineal  DE MOTORES
     //
     //
+    /*
     
     double allowed_error=0.02;
     double error_lineal = vx - vel_x;
@@ -318,12 +320,12 @@ int main(int argc, char** argv)
     double integral_lineal = old_integral_lineal + error_lineal;
     double integral_angular = old_integral_angular + error_angular;
 
-    double kp_l = 6;
-    double ki_l = 0.35;
+    double kp_l = 1;
+    double ki_l = 0;
 
 
-    double kp_a = 9;
-    double ki_a = 0.4;
+    double kp_a = 1;
+    double ki_a = 0;
 
 
     double controlPID_lineal = (vx+(kp_l*error_lineal) + (ki_l*integral_lineal)); 
@@ -331,8 +333,8 @@ int main(int argc, char** argv)
 
     if (error_lineal <= allowed_error && error_angular <= allowed_error ){
 	
-            double velocity_left = (vx -  vth * g_wheelbase / 2.0);
-	    double velocity_right = (vx + vth * g_wheelbase / 2.0);
+            double velocity_left = vx -  (vth * g_wheelbase / 2.0);
+	    double velocity_right = vx + (vth * g_wheelbase / 2.0);
 	
 	    //Motor duty command send
 	    // calcaulate duty cycle form velocity and duty factor
@@ -374,7 +376,7 @@ int main(int argc, char** argv)
 
 
 
-
+    */
     //
     //
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

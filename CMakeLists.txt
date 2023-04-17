@@ -153,11 +153,11 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
-add_executable(diff_motor_driver src/bb-blue-diff-motor-driver-node.cpp)
-target_link_libraries(diff_motor_driver ${catkin_LIBRARIES} robotcontrol)
+#add_executable(diff_motor_driver src/bb-blue-diff-motor-driver-node.cpp)
+#target_link_libraries(diff_motor_driver ${catkin_LIBRARIES} robotcontrol)
 
-add_executable(odomencodertest src/bbodomencodertest.cpp)
-target_link_libraries(odomencodertest ${catkin_LIBRARIES} robotcontrol)
+#add_executable(odomencodertest src/bbodomencodertest.cpp)
+#target_link_libraries(odomencodertest ${catkin_LIBRARIES} robotcontrol)
 
 add_executable(vel_control_odom src/vel_control_odom.cpp)
 target_link_libraries(vel_control_odom ${catkin_LIBRARIES} robotcontrol)
