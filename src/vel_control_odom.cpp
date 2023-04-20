@@ -43,10 +43,10 @@ bool g_driving = 0;
 int g_left_motor;      // param default 1
 int g_right_motor;     // param default 2
 double g_maxspeed=0.4;     // param default 0.4
-double g_minspeed;     // param default 0.1
-double g_turnspeed;    // param default 1
-double g_wheelbase;    // param default 0.2
-double g_duty_factor=2;  // param default 2.0
+double g_minspeed=0.05;     // param default 0.1
+double g_turnspeed=1;    // param default 1
+double g_wheelbase=0.1;    // param default 0.2
+double g_duty_factor=2.0;  // param default 2.0
 int g_rate;            // param default 10
 
 double vx = 0;
@@ -105,8 +105,8 @@ int main(int argc, char** argv)
   ros::param::param("~timeout", cmd_vel_timeout, 5);
   ros::param::param("~left_motor", g_left_motor, 1);
   ros::param::param("~right_motor", g_right_motor, 2);
-  ros::param::param("~maxspeed", g_maxspeed, 0.8);
-  ros::param::param("~minspeed", g_minspeed, 0.1);
+  ros::param::param("~maxspeed", g_maxspeed, 0.4);
+  ros::param::param("~minspeed", g_minspeed, 0.05);
   ros::param::param("~wheelbase", g_wheelbase, 0.16);
   ros::param::param("~turnspeed", g_turnspeed, 1.0);
   ros::param::param("~duty_factor", g_duty_factor, 1.0);
@@ -142,7 +142,7 @@ int main(int argc, char** argv)
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 10);
   tf::TransformBroadcaster odom_broadcaster;
   // cmd_vel subscriber
-  ros::Subscriber sub = n.subscribe("cmd_vel", 100, cmd_velCallback);
+  ros::Subscriber sub = n.subscribe("cmd_vel", 10, cmd_velCallback);
  
   double x = 0.0;
   double y = 0.0;
@@ -151,9 +151,12 @@ int main(int argc, char** argv)
   //odom variables
 
   //meters per tick
-  double mpt=0.000169162;
-  //La distancia entre la llanta y el centro del robot es de 0.08 m
-  double robot_radius=0.08;
+  // mpt=wheel perimeter/(encoder cpr * N relation)
+  // wheel perimeter = 2*pi*wheel_radius
+  // Hyakabai is 7cm diameter
+  double mpt=0.000140969;
+  //La distancia entre la llanta y el centro del robot es de 0.1 m, incluyendo la mitad de la llanta
+  double robot_radius=0.1;
   double old_left_encoder_pos=0;
   double old_right_encoder_pos=0;
   double actual_left_encoder_pos;
@@ -238,14 +241,16 @@ int main(int argc, char** argv)
 // compute odometry in a typical way given the velocities of the robot
     double dt = (current_time - last_time).toSec();
 
-    double vel_x=delta_dr/dt;
-    double vel_y=delta_dl/dt;
-    double vel_th=(delta_dl-delta_dr)/dt;
+    double vel_th=(delta_dr-delta_dl)/dt;
 
 
-    double delta_x = delta_distance*(double)cos(th)*dt*10;
-    double delta_y = delta_distance*(double)sin(th)*dt*10;
-    double delta_th = (delta_dl-delta_dr)/(2*robot_radius);
+    double delta_x = delta_distance*(double)cos(th)*dt*100;
+    double delta_y = delta_distance*(double)sin(th)*dt*100;
+    double delta_th = (delta_dr-delta_dl)/(2*robot_radius);
+
+
+    double vel_x = (delta_x-x)/dt;
+    double vel_y = (delta_y-y)/dt;
 
   
 
@@ -285,12 +290,12 @@ int main(int argc, char** argv)
     // Aqui ya calculo todo ----------------<<<<<<<<<<<<<<
     //
     
-    double velocity_left = vx - (vth * g_wheelbase / 2.0);
-    double velocity_right = vx +(vth * g_wheelbase / 2.0);
+    double velocity_left =0.05* (2*vx - vth*(2*robot_radius) )/(2*0.035);
+    double velocity_right = 0.05*(2*vx + vth*(2*robot_radius))/(2*0.035);
 
     //Motor duty command send
     // calcaulate duty cycle form velocity and duty factor
-    double duty_left = g_duty_factor * velocity_left*-1;
+    double duty_left = g_duty_factor * velocity_left*-1.175;
     // multiplicar 1.175 el duty right
     double duty_right = g_duty_factor * velocity_right;
 
