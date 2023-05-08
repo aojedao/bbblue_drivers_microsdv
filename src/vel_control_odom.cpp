@@ -395,7 +395,7 @@ int main(int argc, char** argv)
     geometry_msgs::TransformStamped odom_trans;
     odom_trans.header.stamp = current_time;
     odom_trans.header.frame_id = "odom";
-    odom_trans.child_frame_id = "base_link";
+    odom_trans.child_frame_id = "base_footprint";
 
     odom_trans.transform.translation.x = x;
     odom_trans.transform.translation.y = y;
@@ -417,7 +417,7 @@ int main(int argc, char** argv)
     odom.pose.pose.orientation = odom_quat;
 
     // set the velocity
-    odom.child_frame_id = "base_link";
+    odom.child_frame_id = "base_footprint";
     odom.twist.twist.linear.x = vel_x;
     odom.twist.twist.linear.y = vel_y;
     odom.twist.twist.angular.z = vel_th;
